@@ -1,57 +1,27 @@
-import React, { useEffect, useState } from "react";
-import {
-  HUMBERGER_LOGO,
-  YOUTUBE_LOGO,
-  YOUTUBE_SEARCH_API,
-} from "../utility/constant";
+import React from "react";
+import { HUMBERGER_LOGO, YOUTUBE_LOGO } from "../utility/constant";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utility/appSlice";
-import { setSearchQuary, setCacheResults } from "../utility/searchSlice";
+import { setSearchQuary } from "../utility/searchSlice";
+import {
+  hideSuggestionBox,
+  showSuggestionBox,
+} from "../utility/suggestionSlice";
+import useSuggestions from "../Hooks/useSuggestions";
 
 const Header = () => {
   const dispatch = useDispatch();
-  const { searchQuery, cacheResults } = useSelector((store) => store.search);
 
-  const [suggestions, setSuggestions] = useState([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchQuery = useSelector((store) => store.search.searchQuery);
 
-  const normalizedQuery = searchQuery.toLowerCase().trim();
+  const { suggestions, showSuggestions } = useSelector(
+    (store) => store.suggestions,
+  );
 
-  useEffect(() => {
-    if (!normalizedQuery) return;
-
-    const timer = setTimeout(() => {
-      if (cacheResults[normalizedQuery]) {
-        setSuggestions(cacheResults[normalizedQuery]);
-        return;
-      }
-
-      const fetchSuggestions = async () => {
-        const data = await fetch(YOUTUBE_SEARCH_API + normalizedQuery);
-        const json = await data.json();
-        console.log("search", json);
-        setSuggestions(json[1]);
-
-        dispatch(
-          setCacheResults({
-            [normalizedQuery]: json[1],
-          }),
-        );
-      };
-
-      fetchSuggestions();
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, [normalizedQuery, cacheResults, dispatch]);
+  useSuggestions(searchQuery);
 
   const handleChange = (e) => {
-    const value = e.target.value;
-    dispatch(setSearchQuary(value));
-
-    if (!value.trim()) {
-      setSuggestions([]);
-    }
+    dispatch(setSearchQuary(e.target.value));
   };
 
   return (
@@ -73,8 +43,12 @@ const Header = () => {
             placeholder="Search"
             value={searchQuery}
             onChange={handleChange}
-            onFocus={() => setShowSuggestions(true)}
-            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            onFocus={() => dispatch(showSuggestionBox())}
+            onBlur={() =>
+              setTimeout(() => {
+                dispatch(hideSuggestionBox());
+              }, 200)
+            }
           />
           <button className="border border-gray-400 px-5 py-2 rounded-r-full bg-gray-100 hover:bg-gray-300">
             🔍
