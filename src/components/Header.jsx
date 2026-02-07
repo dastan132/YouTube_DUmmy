@@ -1,63 +1,102 @@
 import React, { useEffect, useState } from "react";
-import { HUMBERGER_LOGO, YOUTUBE_LOGO, YOUTUBE_SEARCH_API } from "../utility/constant";
-import { useDispatch } from "react-redux";
+import {
+  HUMBERGER_LOGO,
+  YOUTUBE_LOGO,
+  YOUTUBE_SEARCH_API,
+} from "../utility/constant";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utility/appSlice";
-
- 
+import { setSearchQuary, setCacheResults } from "../utility/searchSlice";
 
 const Header = () => {
-  const [searchQuery, setSearchQueery] = useState("")
-  useEffect(() => {
-    const getSearchSuggestion = async () => {
-      try {
-        const data = await fetch(YOUTUBE_SEARCH_API + searchQuery);
-        const json = await data.json()
-        console.log("search",json)
-      } catch (error) {
-        console.error("Error fetching search suggestions:", error);
-      }
-    };
-   const timer = setTimeout(() => getSearchSuggestion(),200);
-   return () => {
-    clearTimeout(timer)
-   }
-  }, [searchQuery])
   const dispatch = useDispatch();
-  const toggleMenuHandle = () => {
-    dispatch((toggleMenu()));
+  const { searchQuery, cacheResults } = useSelector((store) => store.search);
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const normalizedQuery = searchQuery.toLowerCase().trim();
+
+  useEffect(() => {
+    if (!normalizedQuery) return;
+
+    const timer = setTimeout(() => {
+      if (cacheResults[normalizedQuery]) {
+        setSuggestions(cacheResults[normalizedQuery]);
+        return;
+      }
+
+      const fetchSuggestions = async () => {
+        const data = await fetch(YOUTUBE_SEARCH_API + normalizedQuery);
+        const json = await data.json();
+        console.log("search", json);
+        setSuggestions(json[1]);
+
+        dispatch(
+          setCacheResults({
+            [normalizedQuery]: json[1],
+          }),
+        );
+      };
+
+      fetchSuggestions();
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [normalizedQuery, cacheResults, dispatch]);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    dispatch(setSearchQuary(value));
+
+    if (!value.trim()) {
+      setSuggestions([]);
+    }
   };
+
   return (
     <div className="grid grid-cols-12 items-center p-5 shadow-lg">
-    
       <div className="col-span-2 flex items-center gap-4">
         <img
-          onClick={() => toggleMenuHandle()}
+          onClick={() => dispatch(toggleMenu())}
           className="h-8 cursor-pointer"
-          alt="Hamburger logo"
+          alt="menu"
           src={HUMBERGER_LOGO}
         />
-        <img
-          className="h-8 cursor-pointer"
-          alt="YouTube logo"
-          src={YOUTUBE_LOGO}
-        />
+        <img className="h-8 cursor-pointer" alt="logo" src={YOUTUBE_LOGO} />
       </div>
 
-      {/* Search Section */}
-      <div className="col-span-8 flex justify-center">
-      {}
-        <input
-          className="w-1/2 px-5 py-2 border border-gray-400 rounded-l-full outline-none"
-          placeholder="Search"
-          value={searchQuery}
-          onChange={(e) => setSearchQueery(e.target.value)}
-        />
-        <button className="border border-gray-400 px-5 py-2 rounded-r-full bg-gray-100 hover:bg-gray-300">
-          🔍
-        </button>
+      <div className="col-span-8 px-10 relative">
+        <div>
+          <input
+            className="w-1/2 px-5 py-2 border border-gray-400 rounded-l-full outline-none"
+            placeholder="Search"
+            value={searchQuery}
+            onChange={handleChange}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          />
+          <button className="border border-gray-400 px-5 py-2 rounded-r-full bg-gray-100 hover:bg-gray-300">
+            🔍
+          </button>
+        </div>
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="absolute bg-white px-2 w-[36rem] rounded-lg shadow-lg border">
+            <ul>
+              {suggestions.map((s, i) => (
+                <li
+                  key={i}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-gray-200 cursor-pointer"
+                >
+                  🔍 {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
-      {/* User Icon */}
       <div className="col-span-2 flex justify-end">
         <img
           className="h-8 cursor-pointer"
