@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { closeMenu } from "../utility/appSlice";
 import { useSearchParams } from "react-router-dom";
+import CommentContainer from "./CommentContainer";
 
 const WatchPage = () => {
   const [searchParams] = useSearchParams();
@@ -22,6 +23,7 @@ const WatchPage = () => {
         allow="autoplay; encrypted-media"
         allowFullScreen
       />
+      <CommentContainer />
     </div>
   );
 };
