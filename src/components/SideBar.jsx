@@ -17,9 +17,6 @@ const watchLater = ["Music", "Sports", "Gaming", "Movies"];
 const SideBar = () => {
   const dispatch = useDispatch();
   const isMenuOpen = useSelector((store) => store?.app?.isMenuOpen);
-  // const activeCategoryId = useSelector(
-  //   (store) => store.videos.selectedCategoryId,
-  // );
 
   if (!isMenuOpen) return null;
 
@@ -30,7 +27,7 @@ const SideBar = () => {
           <li key={item.name}>
             <NavLink
               to={item.path}
-              end={item.path === "/"} // VERY IMPORTANT
+              end={item.path === "/"} 
               onClick={() => dispatch(setCategoryId(item.id))}
               className={({ isActive }) =>
                 [
