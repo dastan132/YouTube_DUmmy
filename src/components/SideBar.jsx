@@ -1,21 +1,26 @@
-
 import React from "react";
-import { useSelector } from "react-redux";
-import { Link, NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
+import { setCategoryId } from "../utility/videoslice";
 
 const mainlinks = [
-  { name: "Home", path: "/" },
-  { name: "Demo", path: "/demo" },
-  { name: "Shorts", path: "/shorts" },
-  { name: "Videos", path: "/videos" },
-  { name: "Live", path: "/live" },
+  { name: "Home", path: "/", id: "0" },
+  { name: "Games", path: "/game", id: "20" },
+  { name: "Sports", path: "/sports", id: "17" },
+  { name: "Music", path: "/music", id: "10" },
+  { name: "Movies", path: "/movies", id: "1" },
 ];
 
 const subscriptions = ["Music", "Sports", "Gaming", "Movies"];
 const watchLater = ["Music", "Sports", "Gaming", "Movies"];
 
 const SideBar = () => {
+  const dispatch = useDispatch();
   const isMenuOpen = useSelector((store) => store?.app?.isMenuOpen);
+  // const activeCategoryId = useSelector(
+  //   (store) => store.videos.selectedCategoryId,
+  // );
+
   if (!isMenuOpen) return null;
 
   return (
@@ -25,10 +30,15 @@ const SideBar = () => {
           <li key={item.name}>
             <NavLink
               to={item.path}
+              end={item.path === "/"} // VERY IMPORTANT
+              onClick={() => dispatch(setCategoryId(item.id))}
               className={({ isActive }) =>
-                `block px-3 py-2 rounded cursor-pointer ${
-                  isActive ? "bg-gray-200 font-semibold" : "hover:bg-gray-100"
-                }`
+                [
+                  "flex items-center p-3 rounded-lg transition duration-150",
+                  isActive
+                    ? "bg-gray-400 text-white font-semibold"
+                    : "text-gray-400 hover:bg-gray-700 hover:text-white",
+                ].join(" ")
               }
             >
               {item.name}
@@ -38,19 +48,25 @@ const SideBar = () => {
       </ul>
       <h1 className="pb-4 pt-5 font-bold text-lg">Subscriptions</h1>
       <ul>
-      {subscriptions.map((item) => (
-        <li key={item} className="px-3 py-2 rounded cursor-pointer hover:bg-gray-100">
-          {item}
-        </li>
-      ))}
+        {subscriptions.map((item) => (
+          <li
+            key={item}
+            className="px-3 py-2 rounded cursor-pointer hover:bg-gray-100"
+          >
+            {item}
+          </li>
+        ))}
       </ul>
       <h1 className=" pb-4 font-bold pt-5 text-lg">Watch Later</h1>
-       <ul>
-      {watchLater.map((item) => (
-        <li key={item} className="px-3 py-2 rounded cursor-pointer hover:bg-gray-100">
-          {item}
-        </li>
-      ))}
+      <ul>
+        {watchLater.map((item) => (
+          <li
+            key={item}
+            className="px-3 py-2 rounded cursor-pointer hover:bg-gray-100"
+          >
+            {item}
+          </li>
+        ))}
       </ul>
     </div>
   );

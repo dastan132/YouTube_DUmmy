@@ -1,18 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const videoSlice = createSlice({
-    name: "video",
-    initialState: {
-        videoList: [],
+  name: "videos",
+  initialState: {
+    videoList: [],
+    selectedCategoryId: "0",
+  },
+  reducers: {
+    addVideos: (state, action) => {
+      state.videoList = action.payload;
     },
-    reducers:{
-        addVideos: (state,actions) => {
-            state.videoList = actions.payload;
-        },
-        
-    }
-})
+    setCategoryId: (state, action) => {
+      state.selectedCategoryId = action.payload;
+    },
+  },
+});
 
-export const {addVideos} = videoSlice.actions;
-
+export const { addVideos, setCategoryId } = videoSlice.actions;
 export default videoSlice.reducer;

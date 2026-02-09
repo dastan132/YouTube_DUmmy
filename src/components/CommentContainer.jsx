@@ -135,7 +135,6 @@ const CommentList = ({ comments }) => {
     <div key={comment.id || index}>
       <Comment data={comment} />
 
-      {/* RECURSION */}
       {comment.replies?.length > 0 && (
         <div className="ml-6 border-l pl-4">
           <CommentList comments={comment.replies} />
