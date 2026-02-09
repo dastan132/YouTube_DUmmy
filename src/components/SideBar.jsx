@@ -31,7 +31,7 @@ const SideBar = () => {
               onClick={() => dispatch(setCategoryId(item.id))}
               className={({ isActive }) =>
                 [
-                  "flex items-center p-3 rounded-lg transition duration-150",
+                  "flex items-center font-bold p-3 rounded-lg transition duration-150",
                   isActive
                     ? "bg-gray-400 text-white font-semibold"
                     : "text-gray-400 hover:bg-gray-700 hover:text-white",

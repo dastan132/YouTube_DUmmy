@@ -8,6 +8,7 @@ import {
   showSuggestionBox,
 } from "../utility/suggestionSlice";
 import useSuggestions from "../Hooks/useSuggestions";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -33,7 +34,9 @@ const Header = () => {
           alt="menu"
           src={HUMBERGER_LOGO}
         />
-        <img className="h-8 cursor-pointer" alt="logo" src={YOUTUBE_LOGO} />
+        <Link to="/">
+          <img className="h-8 cursor-pointer" alt="logo" src={YOUTUBE_LOGO} />
+        </Link>
       </div>
 
       <div className="col-span-8 px-10 relative">
